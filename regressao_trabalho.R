@@ -36,6 +36,29 @@ ggplot(GasolineYield, aes(x = temp, y = yield)) +
   theme(panel.grid = element_blank(),
         legend.position = "bottom")
 
+fitdistrplus::descdist(GasolineYield$yield,graph = F)
+
+a <- ((4.08647/(0.011492*25.87218))-1)/5.08647;a
+
+b <- 4.08647*a;b
+
+func <- dbeta
+cond <- seq(0,1,length.out = 1000)
+
+ggplot(GasolineYield, aes(x = yield)) +
+  geom_density(fill = "grey97",color = "darkgrey") +
+  stat_function(fun = func, n=length(cond),
+                args = list(shape1=a,shape2=b),
+                inherit.aes = FALSE,linetype=2,color="red")+
+  xlim(0,1)+
+  annotate("text",x=0.35,y=3,label="Beta(2,5;10,2)",fontface = "bold",color="red")+
+  labs(y="Densidade",
+       x="Proporção de oléo convertido para gasolina",
+       title="Densidade empírica da variável resposta")+
+  theme_light()+
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom")
+
 # Função para criar os gráficos de diagnóstico
 graficos_diagnostico <- function(ajuste_f,a){
   

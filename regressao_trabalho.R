@@ -13,29 +13,19 @@ ajuste <- betareg(yield ~ temp + batch, link = "logit",
                    data = GasolineYield,x=T)
 summary(ajuste)
 
-# Modelos com funções logito e log-log para criar o gráfico
-ajuste1g <- betareg(yield ~ temp, link = "logit",
-                    data = GasolineYield, subset = batch == 6)
-ajuste2g <- betareg(yield ~ temp, link = "loglog",
-                    data = GasolineYield, subset = batch == 6)
-
-ggplot(GasolineYield, aes(x = temp, y = yield)) +
-  geom_point(size = 4, aes(fill = batch), shape = 21) +
-  scale_fill_grey() +
-  geom_line(aes(y = predict(ajuste2g, GasolineYield),
-                colour = "log-log", linetype = "log-log")) +
-  geom_line(aes(y = predict(ajuste1g, GasolineYield), 
-                colour = "logit", linetype = "logit")) +
-  scale_colour_manual("", values = c("red", "blue")) +
-  scale_linetype_manual("", values = c("solid", "dashed")) +
+# Função para criar o gráfico de boxplot
+ggplot(GasolineYield, aes(x = batch, y = yield,fill = batch)) +
+  geom_boxplot() +
+  scale_fill_grey(start=0.3,end=0.8) +
   labs(y="Proporção de oléo convertido para gasolina",
-       x="Temperatura (F°) em que a gasolina evaporou",
+       x="Condição do lote",
        fill="Condição do lote",
-       title="Comparação entre as funções de ligação logito e log-log no ajuste")+
+       title="Boxplot da proporção de óleo convertido para gasolina por condição de lote")+
   theme_light()+
   theme(panel.grid = element_blank(),
         legend.position = "bottom")
 
+# Função para criar o gráfico de densidade
 fitdistrplus::descdist(GasolineYield$yield,graph = F)
 
 a <- ((4.08647/(0.011492*25.87218))-1)/5.08647;a
@@ -59,9 +49,32 @@ ggplot(GasolineYield, aes(x = yield)) +
   theme(panel.grid = element_blank(),
         legend.position = "bottom")
 
+# Modelos com funções logito e log-log para criar o gráfico
+ajuste1g <- betareg(yield ~ temp, link = "logit",
+                    data = GasolineYield, subset = batch == 6)
+ajuste2g <- betareg(yield ~ temp, link = "loglog",
+                    data = GasolineYield, subset = batch == 6)
+
+ggplot(GasolineYield, aes(x = temp, y = yield)) +
+  geom_point(size = 4, aes(fill = batch), shape = 21) +
+  scale_fill_grey() +
+  geom_line(aes(y = predict(ajuste2g, GasolineYield),
+                colour = "log-log", linetype = "log-log")) +
+  geom_line(aes(y = predict(ajuste1g, GasolineYield), 
+                colour = "logit", linetype = "logit")) +
+  scale_colour_manual("", values = c("red", "blue")) +
+  scale_linetype_manual("", values = c("solid", "dashed")) +
+  labs(y="Proporção de oléo convertido para gasolina",
+       x="Temperatura (F°) em que a gasolina evaporou",
+       fill="Condição do lote",
+       title="Comparação entre as funções de ligação logito e log-log no ajuste")+
+  theme_light()+
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom")
+
 # Função para criar os gráficos de diagnóstico
 graficos_diagnostico <- function(ajuste_f,a){
-  
+  library(ggplotify)
   set.seed(123)
   p <- ncol(model.matrix(ajuste_f))
   n <- nrow(model.matrix(ajuste_f))

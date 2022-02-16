@@ -8,23 +8,6 @@ library(gridExtra)
 data("GasolineYield", package = "betareg")
 head(GasolineYield)
 
-# Modelo de Regressão Beta com função de ligação logito
-ajuste <- betareg(yield ~ temp + batch, link = "logit",
-                   data = GasolineYield,x=T)
-summary(ajuste)
-
-# Função para criar o gráfico de boxplot
-ggplot(GasolineYield, aes(x = batch, y = yield,fill = batch)) +
-  geom_boxplot() +
-  scale_fill_grey(start=0.3,end=0.8) +
-  labs(y="Proporção de oléo convertido para gasolina",
-       x="Condição do lote",
-       fill="Condição do lote",
-       title="Boxplot da proporção de óleo convertido para gasolina por condição de lote")+
-  theme_light()+
-  theme(panel.grid = element_blank(),
-        legend.position = "bottom")
-
 # Função para criar o gráfico de densidade
 fitdistrplus::descdist(GasolineYield$yield,graph = F)
 
@@ -45,6 +28,18 @@ ggplot(GasolineYield, aes(x = yield)) +
   labs(y="Densidade",
        x="Proporção de oléo convertido para gasolina",
        title="Densidade empírica da variável resposta")+
+  theme_light()+
+  theme(panel.grid = element_blank(),
+        legend.position = "bottom")
+
+# Função para criar o gráfico de boxplot
+ggplot(GasolineYield, aes(x = batch, y = yield,fill = batch)) +
+  geom_boxplot() +
+  scale_fill_grey(start=0.3,end=0.8) +
+  labs(y="Proporção de oléo convertido para gasolina",
+       x="Condição do lote",
+       fill="Condição do lote",
+       title="Boxplot da proporção de óleo convertido para gasolina por condição de lote")+
   theme_light()+
   theme(panel.grid = element_blank(),
         legend.position = "bottom")
@@ -71,6 +66,11 @@ ggplot(GasolineYield, aes(x = temp, y = yield)) +
   theme_light()+
   theme(panel.grid = element_blank(),
         legend.position = "bottom")
+
+# Modelo de Regressão Beta com função de ligação logito
+ajuste <- betareg(yield ~ temp + batch, link = "logit",
+                  data = GasolineYield,x=T)
+summary(ajuste)
 
 # Função para criar os gráficos de diagnóstico
 graficos_diagnostico <- function(ajuste_f,a){
